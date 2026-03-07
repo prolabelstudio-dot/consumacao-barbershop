@@ -1,6 +1,14 @@
 import type { MenuItem, Product, Reward } from "./types";
 
-export const API_BASE_URL = "http://localhost:3001";
+const envBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
+const isLocalBrowser =
+  typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+export const API_BASE_URL = envBaseUrl
+  ? envBaseUrl.replace(/\/$/, "")
+  : isLocalBrowser
+    ? "http://localhost:3001"
+    : "";
 
 export const REWARDS: Reward[] = [
   { id: "agua", name: "1 Agua", cost: 40 },
