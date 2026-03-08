@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(uuid())
+  name         String
+  phone        String        @unique
+  passwordHash String
+  role         String        @default("CLIENT")
+  totalPoints  Int           @default(0)
+  currentTier  String        @default("Recruta")
+  transactions Transaction[] @relation("UserTransactions")
+  administered Transaction[] @relation("AdminTransactions")
+  createdAt    DateTime      @default(now())
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  price       Float
+  category    String
+  pointsAward Int      @default(10)
+  stock       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+model Transaction {
+  id           String   @id @default(uuid())
+  amountSpent  Float
+  pointsEarned Int
+  description  String
+  date         DateTime @default(now())
+
+  userId String
+  user   User   @relation("UserTransactions", fields: [userId], references: [id])
+
+  adminId String?
+  admin   User?  @relation("AdminTransactions", fields: [adminId], references: [id])
+}
+
+model Reward {
+  id             String  @id @default(uuid())
+  name           String
+  pointsRequired Int
+  active         Boolean @default(true)
+}
+
+model Config {
+  id             Int      @id @default(1)
+  licenseKey     String?  @unique
+  shopName       String?
+  isActivated    Boolean  @default(false)
+  lastCheckDate  DateTime?
+  machineId      String?
+  activationDate DateTime?
+}
